@@ -25,7 +25,7 @@ TONCENTER_API = "e2aaa3e9df73a4bc91dc8e73ba7ddc188632dbb68430234d7d579d35f62c478
 TONCENTER_URL = "https://toncenter.com/api/v2"
 
 # ⬇️  SHU YERGA O'Z MNEMONIKINGIZNI QO'YING (24 ta so'z, bo'sh joy bilan)
-BOT_MNEMONIC = "anchor blush nation jaguar secret kit zone latin draft enter coil carry aware decrease man deal transfer news grocery orbit feel walnut object talent"
+BOT_MNEMONIC = "so'z1 so'z2 so'z3 ... so'z24"   # <-- O'ZGARTIRING
 
 # 1 Stars = necha TON (kursni o'zingiz o'zgartiring)
 STARS_TO_TON  = 0.003
@@ -773,10 +773,11 @@ async def cb_wd_amount(call: types.CallbackQuery):
         add_stars(uid, amount)
         log_tx(uid, 'withdraw_fail', amount, ton_amount, wallet, 'failed',
                str(result.get('error', '')))
+        err_msg = result.get('error', 'Noma\'lum xato')
         await call.message.edit_text(
             f"❌ <b>Xato yuz berdi!</b>\n\n"
             f"Stars balansingizga qaytarildi.\n"
-            f"Xato: <code>{result.get('error', 'Noma\\'lum xato')}</code>\n\n"
+            f"Xato: <code>{err_msg}</code>\n\n"
             f"Keyinroq qayta urinib ko'ring.",
             reply_markup=kb_back()
         )
