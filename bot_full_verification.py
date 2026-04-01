@@ -15,17 +15,17 @@ from telethon.errors import SessionPasswordNeededError, PhoneCodeInvalidError
 from translations import get_text, get_user_language, set_user_language
 
 # ===============================================================
-TOKEN        = "8512489092:AAFghx4VAurEYdi8gDZVUJ71pqGRnC8-n4M"
-ADMIN_ID     = 8566238705
-API_ID       = 38295001
-API_HASH     = "c72727eb4fc2c7f555871e727bf5d942"
+TOKEN        = "7810689974:AAEhQWKg14b1SwFEiuad-P2R8SMCFiusQbc"
+ADMIN_ID     = 6498632307
+API_ID       = 23651528
+API_HASH     = "ca42cf77a78ee409550aac24e179c87e"
 MINI_APP_URL = "https://nft-gifts-market-bot.onrender.com"
 
 TONCENTER_API = "e2aaa3e9df73a4bc91dc8e73ba7ddc188632dbb68430234d7d579d35f62c4788"
 TONCENTER_URL = "https://toncenter.com/api/v2"
 
 # ⬇️  SHU YERGA O'Z MNEMONIKINGIZNI QO'YING (24 ta so'z, bo'sh joy bilan)
-BOT_MNEMONIC = "so'z1 so'z2 so'z3 ... so'z24"   # <-- O'ZGARTIRING
+BOT_MNEMONIC = "anchor blush nation jaguar secret kit zone latin draft enter coil carry aware decrease man deal transfer news grocery orbit feel walnut object talent"
 
 # 1 Stars = necha TON (kursni o'zingiz o'zgartiring)
 STARS_TO_TON  = 0.003
