@@ -1,0 +1,257 @@
+/* Основные стили */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+    border-bottom: 1px solid rgba(0,0,0,0.125);
+}
+
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    border: none;
+}
+
+.btn-success {
+    background: linear-gradient(45deg, #28a745, #1e7e34);
+    border: none;
+}
+
+.btn-warning {
+    background: linear-gradient(45deg, #ffc107, #e0a800);
+    border: none;
+}
+
+.btn-danger {
+    background: linear-gradient(45deg, #dc3545, #c82333);
+    border: none;
+}
+
+/* Стили для кода верификации */
+.code-input {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+}
+
+.code-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+/* Анимации */
+.auth-step {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для статусов сделок */
+.badge {
+    font-size: 0.8rem;
+    padding: 0.5em 0.8em;
+}
+
+/* Стили для админ панели */
+.nav-pills .nav-link {
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-pills .nav-link:hover {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+}
+
+/* Стили для таблиц */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table thead th {
+    border-bottom: 2px solid #dee2e6;
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.table-responsive {
+    border-radius: 8px;
+}
+
+/* Стили для модальных окон */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+}
+
+.modal-header {
+    border-radius: 15px 15px 0 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 2rem 1rem !important;
+    }
+    
+    .hero-section h1 {
+        font-size: 2rem !important;
+    }
+    
+    .code-input {
+        width: 40px !important;
+        font-size: 1.2rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Стили для уведомлений */
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+.alert-info {
+    background: linear-gradient(45deg, #d1ecf1, #bee5eb);
+    color: #0c5460;
+}
+
+.alert-success {
+    background: linear-gradient(45deg, #d4edda, #c3e6cb);
+    color: #155724;
+}
+
+.alert-warning {
+    background: linear-gradient(45deg, #fff3cd, #ffeaa7);
+    color: #856404;
+}
+
+.alert-danger {
+    background: linear-gradient(45deg, #f8d7da, #f5c6cb);
+    color: #721c24;
+}
+
+/* Стили для форм */
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+/* Стили для статистических карточек */
+.bg-primary {
+    background: linear-gradient(45deg, #007bff, #0056b3) !important;
+}
+
+.bg-success {
+    background: linear-gradient(45deg, #28a745, #1e7e34) !important;
+}
+
+.bg-warning {
+    background: linear-gradient(45deg, #ffc107, #e0a800) !important;
+}
+
+.bg-info {
+    background: linear-gradient(45deg, #17a2b8, #138496) !important;
+}
+
+/* Дополнительные утилиты */
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+.shadow {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Стили для загрузки */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Кастомные цвета для валют */
+.currency-stars {
+    color: #ffc107;
+}
+
+.currency-rub {
+    color: #28a745;
+}
+
+.currency-uah {
+    color: #007bff;
+}
+
+.currency-usd {
+    color: #6f42c1;
+}
+
+.currency-eur {
+    color: #fd7e14;
+}

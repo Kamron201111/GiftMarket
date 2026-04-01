@@ -1,0 +1,254 @@
+{% extends "mini_app/base.html" %}
+
+{% block title %}NFT Gifts Market - Главная{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-bottom: 16px; color: var(--tg-theme-text-color);">
+        🎁 Добро пожаловать в NFT Gifts Market!
+    </h2>
+    <p style="color: var(--tg-theme-hint-color); margin-bottom: 16px;">
+        Безопасная торговля NFT подарками Telegram с гарантией сделок
+    </p>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0;">
+        <div style="text-align: center; padding: 16px; background: var(--tg-theme-bg-color); border-radius: 8px; border: 1px solid var(--tg-theme-hint-color);">
+            <div style="font-size: 24px; font-weight: bold; color: var(--tg-theme-link-color);">5,000</div>
+            <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Успешных сделок</div>
+        </div>
+        <div style="text-align: center; padding: 16px; background: var(--tg-theme-bg-color); border-radius: 8px; border: 1px solid var(--tg-theme-hint-color);">
+            <div style="font-size: 24px; font-weight: bold; color: var(--tg-theme-link-color);">4,251</div>
+            <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Активных трейдеров</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 12px;">🚀 Быстрые действия</h3>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <button class="btn" onclick="navigateTo('/create')">
+            ➕ Создать сделку
+        </button>
+        
+        <button class="btn btn-secondary" onclick="navigateTo('/deals')">
+            📋 Мои сделки
+        </button>
+        
+        <button class="btn btn-secondary" onclick="navigateTo('/profile')">
+            👤 Мой профиль
+        </button>
+        
+        <button class="btn btn-secondary" onclick="window.open('https://t.me/+trsTIdq4X8IyOTdi', '_blank')" style="background: #0088cc; color: white;">
+            📢 Telegram канал
+        </button>
+        
+        <button class="btn btn-secondary" onclick="window.open('https://t.me/noscamnftsup', '_blank')" style="background: #28a745; color: white;">
+            💬 Поддержка
+        </button>
+        
+        <button class="btn btn-secondary" onclick="navigateTo('/link-uid')" style="background: #6f42c1; color: white;">
+            🔗 Привязать UID
+        </button>
+        
+        <button class="btn btn-secondary" onclick="showRules()" style="background: #17a2b8; color: white;">
+            📜 Правила
+        </button>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 12px;">📊 Статистика платформы</h3>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+        <div style="text-align: center; padding: 12px; background: var(--tg-theme-bg-color); border-radius: 8px; border: 1px solid var(--tg-theme-hint-color);">
+            <div style="font-size: 18px; font-weight: bold; color: var(--tg-theme-link-color);">5,006</div>
+            <div style="font-size: 11px; color: var(--tg-theme-hint-color);">Сделок</div>
+        </div>
+        <div style="text-align: center; padding: 12px; background: var(--tg-theme-bg-color); border-radius: 8px; border: 1px solid var(--tg-theme-hint-color);">
+            <div style="font-size: 18px; font-weight: bold; color: #28a745;">4,467</div>
+            <div style="font-size: 11px; color: var(--tg-theme-hint-color);">Трейдеров</div>
+        </div>
+        <div style="text-align: center; padding: 12px; background: var(--tg-theme-bg-color); border-radius: 8px; border: 1px solid var(--tg-theme-hint-color);">
+            <div style="font-size: 18px; font-weight: bold; color: #ffc107;">⭐ 1,250</div>
+            <div style="font-size: 11px; color: var(--tg-theme-hint-color);">Звезд</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 12px;">💡 Как это работает?</h3>
+    
+    <div style="margin: 12px 0;">
+        <div style="display: flex; align-items: center; margin: 8px 0;">
+            <div style="width: 24px; height: 24px; background: var(--tg-theme-link-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 12px; font-weight: bold;">1</div>
+            <span style="font-size: 14px;">Создайте сделку с NFT подарком</span>
+        </div>
+        <div style="display: flex; align-items: center; margin: 8px 0;">
+            <div style="width: 24px; height: 24px; background: var(--tg-theme-link-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 12px; font-weight: bold;">2</div>
+            <span style="font-size: 14px;">Отправьте ссылку покупателю</span>
+        </div>
+        <div style="display: flex; align-items: center; margin: 8px 0;">
+            <div style="width: 24px; height: 24px; background: var(--tg-theme-link-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 12px; font-weight: bold;">3</div>
+            <span style="font-size: 14px;">Получите оплату безопасно</span>
+        </div>
+        <div style="display: flex; align-items: center; margin: 8px 0;">
+            <div style="width: 24px; height: 24px; background: var(--tg-theme-link-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 12px; font-weight: bold;">4</div>
+            <span style="font-size: 14px;">Переведите NFT и завершите сделку</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 12px;">🛡️ Гарантии безопасности</h3>
+    
+    <div style="display: flex; align-items: center; margin: 8px 0;">
+        <span style="margin-right: 8px;">✅</span>
+        <span style="font-size: 14px;">Эскроу система защиты средств</span>
+    </div>
+    <div style="display: flex; align-items: center; margin: 8px 0;">
+        <span style="margin-right: 8px;">✅</span>
+        <span style="font-size: 14px;">Проверка подлинности NFT</span>
+    </div>
+    <div style="display: flex; align-items: center; margin: 8px 0;">
+        <span style="margin-right: 8px;">✅</span>
+        <span style="font-size: 14px;">Поддержка 24/7</span>
+    </div>
+    <div style="display: flex; align-items: center; margin: 8px 0;">
+        <span style="margin-right: 8px;">✅</span>
+        <span style="font-size: 14px;">Возврат средств при отмене</span>
+    </div>
+</div>
+
+<div class="card" style="text-align: center; background: linear-gradient(135deg, var(--tg-theme-link-color, #2481cc), var(--tg-theme-button-color, #2481cc)); color: white; border: none;">
+    <h3 style="margin-bottom: 8px;">🎯 Начните торговать прямо сейчас!</h3>
+    <p style="margin-bottom: 16px; opacity: 0.9;">Присоединяйтесь к тысячам успешных трейдеров</p>
+    <button class="btn" style="background: rgba(255,255,255,0.2); color: white;" onclick="navigateTo('/create')">
+        Создать первую сделку
+    </button>
+</div>
+
+{% if user %}
+<div class="alert alert-info">
+    <strong>👋 Привет, {{ user.first_name }}!</strong><br>
+    Вы авторизованы и можете создавать сделки
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Обработка параметров запуска для перехода к сделке
+    function handleStartupParams() {
+        let startParam = null;
+        
+        // Пробуем разные способы получения параметра
+        if (window.telegramWebApp && window.telegramWebApp.initDataUnsafe) {
+            startParam = window.telegramWebApp.initDataUnsafe.start_param;
+        }
+        
+        // Проверяем URL параметры
+        if (!startParam) {
+            const urlParams = new URLSearchParams(window.location.search);
+            startParam = urlParams.get('tgWebAppStartParam') || urlParams.get('startapp');
+        }
+        
+        // Проверяем hash параметры
+        if (!startParam && window.location.hash) {
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            startParam = hashParams.get('tgWebAppStartParam') || hashParams.get('startapp');
+        }
+        
+        console.log('Найден start param:', startParam);
+        
+        if (startParam && startParam.startsWith('deal_')) {
+            const dealId = startParam.replace('deal_', '');
+            console.log('Переход к сделке:', dealId);
+            
+            // Показываем уведомление о переходе
+            if (window.telegramWebApp) {
+                window.telegramWebApp.showAlert(`Переход к сделке #${dealId}...`);
+            }
+            
+            // Перенаправляем на страницу сделки
+            setTimeout(() => {
+                window.location.href = '/deal/' + dealId;
+            }, 1000);
+            
+            return true; // Параметр обработан
+        }
+        
+        return false; // Параметр не найден
+    }
+    
+    // Обрабатываем параметры запуска
+    const paramHandled = handleStartupParams();
+    
+    // Показываем информацию о пользователе если доступна
+    if (window.telegramUser && !paramHandled) {
+        console.log('Пользователь:', window.telegramUser);
+        
+        // Можно добавить персонализацию
+        const welcomeCard = document.querySelector('.card h2');
+        if (welcomeCard && window.telegramUser.first_name) {
+            welcomeCard.innerHTML = `🎁 Привет, ${window.telegramUser.first_name}!`;
+        }
+    }
+    
+    // Настройка главной кнопки Telegram
+    if (window.telegramWebApp && !paramHandled) {
+        window.telegramWebApp.MainButton.setText('Создать сделку');
+        window.telegramWebApp.MainButton.onClick(() => {
+            navigateTo('/create');
+        });
+        window.telegramWebApp.MainButton.show();
+    }
+});
+
+function showRules() {
+    const rulesText = `
+📜 ПРАВИЛА ПЛАТФОРМЫ NFT GIFTS MARKET
+
+🛡️ БЕЗОПАСНОСТЬ:
+• Все сделки проходят через систему гарантий
+• Средства защищены до завершения сделки
+• Проверка подлинности NFT подарков
+
+💰 КОМИССИИ:
+• Создание сделки: Бесплатно
+• Комиссия платформы: 5% от суммы сделки
+• Вывод средств: Без комиссии
+
+🤝 ПРОЦЕСС СДЕЛКИ:
+1. Продавец создает сделку и указывает цену
+2. Покупатель оплачивает через платформу
+3. Продавец передает NFT покупателю
+4. Покупатель подтверждает получение
+5. Средства переводятся продавцу
+
+❌ ЗАПРЕЩЕНО:
+• Мошенничество и обман
+• Продажа поддельных NFT
+• Отмена сделки без причины
+• Оскорбления и угрозы
+
+⚖️ СПОРЫ:
+• При возникновении спора обращайтесь в поддержку
+• Администрация рассматривает каждый случай
+• Решение принимается в течение 24 часов
+
+📞 ПОДДЕРЖКА:
+• Telegram: @noscamnftsup
+• Время работы: 24/7
+• Среднее время ответа: 1-2 часа
+    `;
+    
+    if (window.telegramWebApp) {
+        window.telegramWebApp.showAlert(rulesText);
+    } else {
+        alert(rulesText);
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends "mini_app/base.html" %}
+
+{% block title %}Привязка UID - NFT Gifts Market{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-bottom: 16px; color: #2481cc;">🔗 Привязка UID к аккаунту</h2>
+    <p style="color: var(--tg-theme-hint-color); font-size: 14px;">
+        Если у вас есть UID от администратора, введите его здесь для получения доступа к админ панели
+    </p>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 12px;">🆔 Ввод UID</h3>
+    
+    <div class="form-group">
+        <label class="form-label">UID (8 символов):</label>
+        <input type="text" id="targetUID" class="form-control" placeholder="Например: UOPVGVSU" maxlength="8" style="text-transform: uppercase;">
+        <small style="color: var(--tg-theme-hint-color);">
+            UID должен содержать ровно 8 символов (буквы и цифры)
+        </small>
+    </div>
+    
+    <button class="btn" onclick="linkUID()">
+        🔗 Привязать UID
+    </button>
+    
+    <div id="linkResult" style="margin-top: 12px;"></div>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 12px;">ℹ️ Информация</h3>
+    <div style="font-size: 14px; color: var(--tg-theme-hint-color);">
+        <p><strong>Что такое UID?</strong></p>
+        <p>UID (Unique Identifier) - это уникальный 8-символьный код, который выдается администратором для получения специальных прав в системе.</p>
+        
+        <p style="margin-top: 12px;"><strong>Как получить UID?</strong></p>
+        <p>Обратитесь к администратору системы для получения вашего персонального UID.</p>
+        
+        <p style="margin-top: 12px;"><strong>Что дает привязка UID?</strong></p>
+        <p>• Доступ к админ панели<br>
+        • Управление пользователями<br>
+        • Просмотр статистики<br>
+        • Пополнение балансов</p>
+    </div>
+</div>
+
+<div class="card" style="text-align: center;">
+    <button class="btn btn-secondary" onclick="navigateTo('/')">
+        🏠 На главную
+    </button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Автоматически преобразуем UID в верхний регистр
+    document.getElementById('targetUID').addEventListener('input', function(e) {
+        e.target.value = e.target.value.toUpperCase();
+    });
+    
+    // Настройка главной кнопки Telegram
+    if (window.telegramWebApp) {
+        window.telegramWebApp.MainButton.setText('Привязать UID');
+        window.telegramWebApp.MainButton.onClick(() => {
+            linkUID();
+        });
+        window.telegramWebApp.MainButton.show();
+    }
+});
+
+function linkUID() {
+    const uid = document.getElementById('targetUID').value.trim().toUpperCase();
+    
+    if (!uid) {
+        showResult('linkResult', 'Введите UID', 'error');
+        return;
+    }
+    
+    if (uid.length !== 8) {
+        showResult('linkResult', 'UID должен содержать ровно 8 символов', 'error');
+        return;
+    }
+    
+    if (!window.telegramUser) {
+        showResult('linkResult', 'Не удалось получить данные Telegram пользователя', 'error');
+        return;
+    }
+    
+    showResult('linkResult', 'Привязываем UID к вашему аккаунту...', 'info');
+    
+    fetch('/api/link_uid', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            uid: uid,
+            telegram_user: window.telegramUser
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showResult('linkResult', `✅ ${data.message}`, 'success');
+            
+            // Очищаем поле
+            document.getElementById('targetUID').value = '';
+            
+            // Перенаправляем на главную через 3 секунды
+            setTimeout(() => {
+                showResult('linkResult', '🔄 Перенаправляем на главную страницу...', 'info');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1000);
+            }, 2000);
+            
+        } else {
+            showResult('linkResult', `❌ ${data.message}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка привязки UID:', error);
+        showResult('linkResult', '❌ Ошибка сети', 'error');
+    });
+}
+
+function showResult(elementId, message, type) {
+    const element = document.getElementById(elementId);
+    let className = 'alert ';
+    
+    switch(type) {
+        case 'success':
+            className += 'alert-success';
+            break;
+        case 'error':
+            className += 'alert-warning';
+            break;
+        case 'info':
+            className += 'alert-info';
+            break;
+        default:
+            className += 'alert-info';
+    }
+    
+    element.innerHTML = `<div class="${className}">${message}</div>`;
+}
+</script>
+{% endblock %}

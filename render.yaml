@@ -1,0 +1,20 @@
+services:
+  # Web Service (Mini App)
+  - type: web
+    name: nft-gifts-market-web
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python mini_app.py"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+
+  # Background Worker (Bot)
+  - type: worker
+    name: nft-gifts-market-bot
+    env: python
+    buildCommand: "pip install -r requirements.txt && python migrate_add_language.py"
+    startCommand: "python bot_full_verification.py"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0

@@ -1,0 +1,242 @@
+{% extends "mini_app/base.html" %}
+
+{% block title %}Мои сделки - NFT Gifts Market{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-bottom: 16px;">📋 Мои сделки</h2>
+    
+    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+        <button class="btn" id="sellerTab" onclick="showTab('seller')" style="flex: 1;">
+            💼 Продажи
+        </button>
+        <button class="btn btn-secondary" id="buyerTab" onclick="showTab('buyer')" style="flex: 1;">
+            🛒 Покупки
+        </button>
+    </div>
+</div>
+
+<!-- Вкладка продаж -->
+<div id="sellerDeals">
+    <div class="card">
+        <h3 style="margin-bottom: 12px;">💼 Мои продажи</h3>
+        <div id="sellerDealsList">
+            <div class="text-center" style="padding: 20px; color: var(--tg-theme-hint-color);">
+                ⏳ Загрузка сделок...
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Вкладка покупок -->
+<div id="buyerDeals" class="hidden">
+    <div class="card">
+        <h3 style="margin-bottom: 12px;">🛒 Мои покупки</h3>
+        <div id="buyerDealsList">
+            <div class="text-center" style="padding: 20px; color: var(--tg-theme-hint-color);">
+                ⏳ Загрузка сделок...
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Шаблон сделки -->
+<template id="dealTemplate">
+    <div class="deal-item">
+        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 8px;">
+            <div>
+                <div class="deal-amount" data-field="amount"></div>
+                <div class="deal-id" data-field="id"></div>
+            </div>
+            <div>
+                <span class="status-badge" data-field="status"></span>
+            </div>
+        </div>
+        
+        <div style="font-size: 14px; color: var(--tg-theme-hint-color); margin-bottom: 8px;">
+            <div data-field="description"></div>
+            <div data-field="created_at"></div>
+        </div>
+        
+        <div style="display: flex; gap: 8px;">
+            <button class="btn" style="flex: 1; padding: 8px; font-size: 14px;" onclick="viewDeal(this)" data-field="view">
+                👁️ Открыть
+            </button>
+            <button class="btn btn-secondary" style="flex: 1; padding: 8px; font-size: 14px;" onclick="shareDeal(this)" data-field="share">
+                📤 Поделиться
+            </button>
+        </div>
+    </div>
+</template>
+
+<!-- Пустое состояние -->
+<template id="emptyTemplate">
+    <div class="text-center" style="padding: 40px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">📭</div>
+        <h3 style="margin-bottom: 8px; color: var(--tg-theme-hint-color);">Пока нет сделок</h3>
+        <p style="color: var(--tg-theme-hint-color); margin-bottom: 16px;">
+            Создайте свою первую сделку для продажи NFT подарка
+        </p>
+        <button class="btn" onclick="navigateTo('/create')">
+            ➕ Создать сделку
+        </button>
+    </div>
+</template>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentTab = 'seller';
+let sellerDeals = [];
+let buyerDeals = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadDeals();
+    
+    // Настройка главной кнопки Telegram
+    if (window.telegramWebApp) {
+        window.telegramWebApp.MainButton.setText('Создать сделку');
+        window.telegramWebApp.MainButton.onClick(() => {
+            navigateTo('/create');
+        });
+        window.telegramWebApp.MainButton.show();
+    }
+});
+
+function showTab(tab) {
+    currentTab = tab;
+    
+    // Обновляем кнопки
+    const sellerTab = document.getElementById('sellerTab');
+    const buyerTab = document.getElementById('buyerTab');
+    
+    if (tab === 'seller') {
+        sellerTab.className = 'btn';
+        buyerTab.className = 'btn btn-secondary';
+        document.getElementById('sellerDeals').classList.remove('hidden');
+        document.getElementById('buyerDeals').classList.add('hidden');
+    } else {
+        sellerTab.className = 'btn btn-secondary';
+        buyerTab.className = 'btn';
+        document.getElementById('sellerDeals').classList.add('hidden');
+        document.getElementById('buyerDeals').classList.remove('hidden');
+    }
+}
+
+function loadDeals() {
+    if (!window.telegramUser) {
+        showAlert('Ошибка: не удалось получить данные пользователя');
+        return;
+    }
+    
+    fetch(`/api/my_deals?user_id=${window.telegramUser.id}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                sellerDeals = data.seller_deals || [];
+                buyerDeals = data.buyer_deals || [];
+                renderDeals();
+            } else {
+                showAlert('Ошибка загрузки сделок');
+            }
+        })
+        .catch(error => {
+            showAlert('Ошибка сети: ' + error.message);
+        });
+}
+
+function renderDeals() {
+    renderDealsList('sellerDealsList', sellerDeals, 'seller');
+    renderDealsList('buyerDealsList', buyerDeals, 'buyer');
+}
+
+function renderDealsList(containerId, deals, type) {
+    const container = document.getElementById(containerId);
+    
+    if (deals.length === 0) {
+        const emptyTemplate = document.getElementById('emptyTemplate');
+        container.innerHTML = emptyTemplate.innerHTML;
+        return;
+    }
+    
+    container.innerHTML = '';
+    
+    deals.forEach(deal => {
+        const dealElement = createDealElement(deal, type);
+        container.appendChild(dealElement);
+    });
+}
+
+function createDealElement(deal, type) {
+    const template = document.getElementById('dealTemplate');
+    const element = template.content.cloneNode(true);
+    
+    // Заполняем данные
+    const amountEl = element.querySelector('[data-field="amount"]');
+    const idEl = element.querySelector('[data-field="id"]');
+    const statusEl = element.querySelector('[data-field="status"]');
+    const descriptionEl = element.querySelector('[data-field="description"]');
+    const createdAtEl = element.querySelector('[data-field="created_at"]');
+    const viewBtn = element.querySelector('[data-field="view"]');
+    const shareBtn = element.querySelector('[data-field="share"]');
+    
+    // Форматируем сумму
+    const currencySymbols = {
+        'stars': '⭐',
+        'rub': '₽',
+        'uah': '₴',
+        'usd': '$',
+        'eur': '€'
+    };
+    
+    amountEl.textContent = `${currencySymbols[deal[6]] || ''} ${deal[5]}`;
+    idEl.textContent = `ID: ${deal[0]}`;
+    
+    // Статус
+    const statusText = {
+        'pending': 'Ожидает оплаты',
+        'paid': 'Оплачено',
+        'completed': 'Завершено',
+        'cancelled': 'Отменено'
+    };
+    
+    statusEl.textContent = statusText[deal[7]] || deal[7];
+    statusEl.className = `status-badge status-${deal[7]}`;
+    
+    // Описание
+    descriptionEl.textContent = deal[11] || 'Без описания';
+    
+    // Дата
+    const date = new Date(deal[8]);
+    createdAtEl.textContent = date.toLocaleDateString('ru-RU');
+    
+    // Кнопки
+    viewBtn.setAttribute('data-deal-id', deal[0]);
+    shareBtn.setAttribute('data-deal-id', deal[0]);
+    
+    // Скрываем кнопку "Поделиться" для покупок
+    if (type === 'buyer') {
+        shareBtn.style.display = 'none';
+        viewBtn.style.flex = '1';
+    }
+    
+    return element;
+}
+
+function viewDeal(button) {
+    const dealId = button.getAttribute('data-deal-id');
+    // Здесь можно открыть детальную страницу сделки
+    showAlert(`Открытие сделки ${dealId}`);
+}
+
+function shareDeal(button) {
+    const dealId = button.getAttribute('data-deal-id');
+    const dealUrl = `https://t.me/noscamnftrbot/app?startapp=deal_${dealId}`;
+    const text = `🎁 Привет! Я создал сделку для продажи NFT подарка. Можешь безопасно купить по этой ссылке: ${dealUrl}`;
+    shareLink(dealUrl, text);
+}
+
+// Обновление сделок каждые 30 секунд
+setInterval(loadDeals, 30000);
+</script>
+{% endblock %}

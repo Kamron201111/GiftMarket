@@ -1,0 +1,127 @@
+{% extends "mini_app/base.html" %}
+
+{% block title %}Профиль - NFT Gifts Market{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <div style="width: 80px; height: 80px; background: var(--tg-theme-link-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 32px; color: white;">
+            👤
+        </div>
+        <h2 id="userName" style="margin-bottom: 4px;">Пользователь</h2>
+        <p id="userInfo" style="color: var(--tg-theme-hint-color); font-size: 14px;">@username</p>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 16px;">ℹ️ Информация</h3>
+    <p style="color: var(--tg-theme-hint-color);">
+        Добро пожаловать в NFT Gifts Market!<br>
+        Здесь вы можете безопасно торговать NFT подарками.
+    </p>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 16px;">⚙️ Действия</h3>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <button class="btn btn-secondary" onclick="window.open('https://t.me/+trsTIdq4X8IyOTdi', '_blank')" style="background: #0088cc; color: white;">
+            📢 Telegram канал
+        </button>
+        
+        <button class="btn btn-secondary" onclick="showSupport()">
+            💬 Поддержка
+        </button>
+        
+        <button class="btn btn-secondary" onclick="shareApp()" style="background: #28a745; color: white;">
+            📤 Поделиться
+        </button>
+        
+        <button class="btn btn-secondary" onclick="showAbout()">
+            ℹ️ О приложении
+        </button>
+    </div>
+</div>
+
+<div class="card" style="text-align: center;">
+    <p style="color: var(--tg-theme-hint-color); font-size: 12px; margin-bottom: 8px;">
+        NFT Gifts Market v2.0 (Simple)
+    </p>
+    <p style="color: var(--tg-theme-hint-color); font-size: 12px;">
+        Безопасная торговля NFT подарками
+    </p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadProfile();
+});
+
+function loadProfile() {
+    if (window.telegramUser) {
+        const user = window.telegramUser;
+        
+        // Показываем имя и username пользователя
+        document.getElementById('userName').textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+        document.getElementById('userInfo').textContent = user.username ? '@' + user.username : 'ID: ' + user.id;
+        
+        console.log('Профиль загружен:', user);
+    } else {
+        console.error('telegramUser не найден');
+        document.getElementById('userInfo').textContent = 'Ошибка: нет данных Telegram';
+    }
+}
+
+function showSupport() {
+    const supportMessage = `
+🆘 Поддержка NFT Gifts Market
+
+📞 Контакты:
+• Telegram: @noscamnftsup
+
+⏰ Время работы: 24/7
+📝 Обычное время ответа: 1-2 часа
+    `;
+    
+    showAlert(supportMessage);
+}
+
+function showAbout() {
+    const aboutMessage = `
+ℹ️ О приложении
+
+NFT Gifts Market - это безопасная платформа для торговли NFT подарками в Telegram.
+
+🛡️ Особенности:
+• Безопасные сделки
+• Проверка подлинности NFT
+• Мгновенные уведомления
+
+📱 Версия: 2.0 (Simple)
+🏢 Разработчик: NFT Gifts Team
+
+Спасибо за использование нашего приложения!
+    `;
+    
+    showAlert(aboutMessage);
+}
+
+function shareApp() {
+    const shareText = `🎁 NFT Gifts Market - безопасная торговля NFT подарками!
+
+✅ Система гарантий
+✅ Защита средств
+✅ Быстрые сделки
+
+Присоединяйся: https://t.me/noscamnftrbot`;
+    
+    if (window.telegramWebApp) {
+        window.telegramWebApp.openTelegramLink(`https://t.me/share/url?url=https://t.me/noscamnftrbot&text=${encodeURIComponent(shareText)}`);
+    } else {
+        showAlert('Ссылка: https://t.me/noscamnftrbot');
+    }
+}
+</script>
+{% endblock %}

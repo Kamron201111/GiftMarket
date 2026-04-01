@@ -1,0 +1,228 @@
+{% extends "mini_app/base.html" %}
+
+{% block title %}Создать сделку - NFT Gifts Market{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-bottom: 16px;">➕ Создать новую сделку</h2>
+    
+    <form id="createDealForm">
+        <div class="form-group">
+            <label class="form-label">🎁 Ссылка на NFT подарок</label>
+            <input type="url" class="form-control" id="nftLink" 
+                   placeholder="https://t.me/gift/..." required>
+            <small style="color: var(--tg-theme-hint-color); font-size: 12px;">
+                Прямая ссылка на NFT подарок в Telegram
+            </small>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">👤 Username получателя (опционально)</label>
+            <input type="text" class="form-control" id="nftUsername" 
+                   placeholder="@username">
+            <small style="color: var(--tg-theme-hint-color); font-size: 12px;">
+                Если NFT должен быть отправлен конкретному пользователю
+            </small>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+                <label class="form-label">💰 Сумма</label>
+                <input type="number" class="form-control" id="amount" 
+                       step="0.01" min="0.01" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">💱 Валюта</label>
+                <select class="form-select" id="currency" required>
+                    <option value="">Выберите</option>
+                    <option value="stars">⭐ Звезды</option>
+                    <option value="rub">₽ Рубли</option>
+                    <option value="uah">₴ Гривны</option>
+                    <option value="usd">$ Доллары</option>
+                    <option value="eur">€ Евро</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">📝 Описание сделки</label>
+            <textarea class="form-control" id="description" rows="3" 
+                      placeholder="Опишите NFT подарок, условия сделки..."></textarea>
+        </div>
+        
+        <div class="alert alert-warning" style="background: #fff3cd; border: 1px solid #ffc107; margin-bottom: 16px;">
+            <strong>⚠️ ВАЖНО - Правила вывода средств:</strong><br>
+            • Вы сможете забрать средства ТОЛЬКО после передачи NFT покупателю<br>
+            • Для вывода средств нужна авторизация в боте<br>
+            • После авторизации напишите в поддержку @noscamnftsup<br>
+            • Администратор проверит сделку и одобрит вывод<br>
+            <br>
+            <strong>🛡️ Это защищает покупателей от мошенничества!</strong>
+        </div>
+        
+        <div class="alert alert-info">
+            <strong>ℹ️ Как работает система:</strong><br>
+            1. Вы создаёте сделку и получаете ссылку<br>
+            2. Покупатель оплачивает через ссылку<br>
+            3. Вы передаёте NFT покупателю<br>
+            4. Администратор подтверждает сделку<br>
+            5. Средства зачисляются на ваш баланс<br>
+            6. Вы запрашиваете вывод через поддержку
+        </div>
+        
+        <button type="submit" class="btn" id="createBtn">
+            ✅ Создать сделку
+        </button>
+        
+        <button type="button" class="btn btn-secondary" onclick="navigateTo('/')">
+            ❌ Отмена
+        </button>
+    </form>
+</div>
+
+<!-- Модальное окно успешного создания -->
+<div id="successModal" class="hidden">
+    <div class="card" style="background: #d4edda; border: 1px solid #c3e6cb;">
+        <h3 style="color: #155724; margin-bottom: 16px;">🎉 Сделка создана!</h3>
+        
+        <div style="margin: 16px 0;">
+            <strong>ID сделки:</strong> <span id="dealId"></span>
+        </div>
+        
+        <div style="margin: 16px 0;">
+            <label class="form-label">🔗 Ссылка для покупателя:</label>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" class="form-control" id="dealUrl" readonly>
+                <button class="btn" style="width: auto; padding: 12px;" onclick="copyDealUrl()">
+                    📋
+                </button>
+            </div>
+        </div>
+        
+        <button class="btn btn-success" onclick="shareDeal()">
+            📤 Поделиться ссылкой
+        </button>
+        
+        <button class="btn btn-secondary" onclick="navigateTo('/deals')">
+            📋 Мои сделки
+        </button>
+        
+        <button class="btn btn-secondary" onclick="createAnother()">
+            ➕ Создать еще одну
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('createDealForm');
+    const createBtn = document.getElementById('createBtn');
+    const successModal = document.getElementById('successModal');
+    
+    // Настройка главной кнопки Telegram
+    if (window.telegramWebApp) {
+        window.telegramWebApp.MainButton.setText('Создать сделку');
+        window.telegramWebApp.MainButton.onClick(submitForm);
+        window.telegramWebApp.MainButton.show();
+    }
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitForm();
+    });
+    
+    function submitForm() {
+        if (!window.telegramUser) {
+            showAlert('Ошибка: не удалось получить данные пользователя');
+            return;
+        }
+        
+        const formData = {
+            nft_link: document.getElementById('nftLink').value,
+            nft_username: document.getElementById('nftUsername').value,
+            amount: parseFloat(document.getElementById('amount').value),
+            currency: document.getElementById('currency').value,
+            description: document.getElementById('description').value,
+            telegram_user: window.telegramUser
+        };
+        
+        // Валидация
+        if (!formData.nft_link || !formData.amount || !formData.currency) {
+            showAlert('Заполните все обязательные поля');
+            return;
+        }
+        
+        // Показываем загрузку
+        createBtn.classList.add('loading');
+        createBtn.textContent = '⏳ Создание...';
+        
+        // Отправляем запрос
+        fetch('/api/create_deal', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            createBtn.classList.remove('loading');
+            createBtn.textContent = '✅ Создать сделку';
+            
+            if (data.success) {
+                // Показываем предупреждение если оно есть
+                if (data.warning) {
+                    showAlert(data.warning);
+                }
+                showSuccess(data.deal_id, data.deal_url);
+            } else {
+                showAlert('Ошибка: ' + data.message);
+            }
+        })
+        .catch(error => {
+            createBtn.classList.remove('loading');
+            createBtn.textContent = '✅ Создать сделку';
+            showAlert('Ошибка сети: ' + error.message);
+        });
+    }
+    
+    function showSuccess(dealId, dealUrl) {
+        document.getElementById('dealId').textContent = dealId;
+        document.getElementById('dealUrl').value = dealUrl;
+        
+        form.style.display = 'none';
+        successModal.classList.remove('hidden');
+        
+        // Скрываем главную кнопку
+        if (window.telegramWebApp) {
+            window.telegramWebApp.MainButton.hide();
+        }
+    }
+    
+    window.copyDealUrl = function() {
+        const urlInput = document.getElementById('dealUrl');
+        copyToClipboard(urlInput.value);
+    };
+    
+    window.shareDeal = function() {
+        const dealUrl = document.getElementById('dealUrl').value;
+        const text = `🎁 Привет! Я создал сделку для продажи NFT подарка. Можешь безопасно купить по этой ссылке: ${dealUrl}`;
+        shareLink(dealUrl, text);
+    };
+    
+    window.createAnother = function() {
+        form.style.display = 'block';
+        successModal.classList.add('hidden');
+        form.reset();
+        
+        // Показываем главную кнопку
+        if (window.telegramWebApp) {
+            window.telegramWebApp.MainButton.show();
+        }
+    };
+});
+</script>
+{% endblock %}

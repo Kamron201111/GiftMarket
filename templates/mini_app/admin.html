@@ -1,0 +1,319 @@
+{% extends "mini_app/base.html" %}
+
+{% block title %}Админ панель - NFT Gifts Market{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-bottom: 16px; color: #dc3545;">🔧 Админ панель</h2>
+    <p style="color: var(--tg-theme-hint-color); font-size: 14px;">
+        Управление пользователями по UID, балансами и статистикой платформы
+    </p>
+</div>
+
+<!-- Статистика -->
+<div class="card">
+    <h3 style="margin-bottom: 12px;">📊 Статистика</h3>
+    <div id="statsContainer">
+        <div class="text-center" style="padding: 20px; color: var(--tg-theme-hint-color);">
+            ⏳ Загрузка статистики...
+        </div>
+    </div>
+</div>
+
+<!-- Пополнение баланса по UID -->
+<div class="card">
+    <h3 style="margin-bottom: 12px;">💰 Пополнение баланса по UID</h3>
+    
+    <div class="form-group">
+        <label class="form-label">🆔 UID пользователя:</label>
+        <input type="text" id="userUID" class="form-control" placeholder="Например: LARGYRST" maxlength="8" style="text-transform: uppercase;">
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">⭐ Звезды:</label>
+        <input type="number" id="starsAmount" class="form-control" placeholder="0" min="0">
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">₽ Рубли:</label>
+        <input type="number" id="rubAmount" class="form-control" placeholder="0" min="0" step="0.01">
+    </div>
+    
+    <button class="btn" onclick="addBalanceByUID()">
+        💰 Пополнить баланс
+    </button>
+    
+    <div id="balanceResult" style="margin-top: 12px;"></div>
+</div>
+
+<!-- Управление пользователями -->
+<div class="card">
+    <h3 style="margin-bottom: 12px;">👥 Все пользователи</h3>
+    
+    <button class="btn btn-secondary" onclick="loadAllUsers()">
+        🔄 Загрузить пользователей
+    </button>
+    
+    <!-- Список пользователей -->
+    <div id="usersContainer" style="margin-top: 16px;">
+        <div class="text-center" style="padding: 20px; color: var(--tg-theme-hint-color);">
+            👆 Нажмите "Загрузить пользователей" для просмотра списка
+        </div>
+    </div>
+</div>
+
+<!-- Накрутка сделок по UID -->
+<div class="card">
+    <h3 style="margin-bottom: 12px;">📈 Накрутка сделок по UID</h3>
+    
+    <div class="form-group">
+        <label class="form-label">🆔 UID пользователя:</label>
+        <input type="text" id="dealsUID" class="form-control" placeholder="Например: LARGYRST" maxlength="8" style="text-transform: uppercase;">
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">🤝 Количество успешных сделок:</label>
+        <input type="number" id="dealsCount" class="form-control" placeholder="0" min="0">
+        <small style="color: var(--tg-theme-hint-color);">
+            Укажите общее количество сделок (не добавляется к текущему, а устанавливается)
+        </small>
+    </div>
+    
+    <button class="btn" onclick="updateDealsCount()" style="background: #ffc107; color: #000;">
+        📈 Установить количество сделок
+    </button>
+    
+    <div id="dealsResult" style="margin-top: 12px;"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadStats();
+    
+    // Автоматически преобразуем UID в верхний регистр
+    document.getElementById('userUID').addEventListener('input', function(e) {
+        e.target.value = e.target.value.toUpperCase();
+    });
+    
+    document.getElementById('dealsUID').addEventListener('input', function(e) {
+        e.target.value = e.target.value.toUpperCase();
+    });
+});
+
+function loadStats() {
+    // Загружаем общую статистику
+    fetch('/api/admin/stats')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const stats = data.stats;
+                document.getElementById('statsContainer').innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div style="text-align: center; padding: 12px; background: var(--tg-theme-bg-color); border-radius: 8px; border: 1px solid var(--tg-theme-hint-color);">
+                            <div style="font-size: 20px; font-weight: bold; color: var(--tg-theme-link-color);">${stats.total_users}</div>
+                            <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Всего пользователей</div>
+                        </div>
+                        <div style="text-align: center; padding: 12px; background: var(--tg-theme-bg-color); border-radius: 8px; border: 1px solid var(--tg-theme-hint-color);">
+                            <div style="font-size: 20px; font-weight: bold; color: #28a745;">${stats.verified_users}</div>
+                            <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Верифицированных</div>
+                        </div>
+                        <div style="text-align: center; padding: 12px; background: var(--tg-theme-bg-color); border-radius: 8px; border: 1px solid var(--tg-theme-hint-color);">
+                            <div style="font-size: 20px; font-weight: bold; color: #ffc107;">⭐ ${stats.total_stars}</div>
+                            <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Всего звезд</div>
+                        </div>
+                        <div style="text-align: center; padding: 12px; background: var(--tg-theme-bg-color); border-radius: 8px; border: 1px solid var(--tg-theme-hint-color);">
+                            <div style="font-size: 20px; font-weight: bold; color: #28a745;">₽ ${stats.total_rub}</div>
+                            <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Всего рублей</div>
+                        </div>
+                        <div style="text-align: center; padding: 12px; background: var(--tg-theme-bg-color); border-radius: 8px; border: 1px solid var(--tg-theme-hint-color);">
+                            <div style="font-size: 20px; font-weight: bold; color: #7b1fa2;">${stats.total_deals}</div>
+                            <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Всего сделок</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('statsContainer').innerHTML = '<div class="alert alert-warning">Ошибка загрузки статистики</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки статистики:', error);
+            document.getElementById('statsContainer').innerHTML = '<div class="alert alert-warning">Ошибка загрузки статистики</div>';
+        });
+}
+
+function addBalanceByUID() {
+    const uid = document.getElementById('userUID').value.trim().toUpperCase();
+    const stars = parseInt(document.getElementById('starsAmount').value) || 0;
+    const rub = parseFloat(document.getElementById('rubAmount').value) || 0;
+    
+    if (!uid) {
+        showResult('balanceResult', 'Введите UID пользователя', 'error');
+        return;
+    }
+    
+    if (uid.length !== 8) {
+        showResult('balanceResult', 'UID должен содержать 8 символов', 'error');
+        return;
+    }
+    
+    if (stars === 0 && rub === 0) {
+        showResult('balanceResult', 'Укажите сумму для пополнения', 'error');
+        return;
+    }
+    
+    showResult('balanceResult', 'Пополняем баланс...', 'info');
+    
+    fetch('/api/admin/add_balance', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            uid: uid,
+            stars: stars,
+            rub: rub
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showResult('balanceResult', `✅ Баланс пополнен для ${data.user_info}`, 'success');
+            // Очищаем форму
+            document.getElementById('userUID').value = '';
+            document.getElementById('starsAmount').value = '';
+            document.getElementById('rubAmount').value = '';
+            // Обновляем статистику
+            loadStats();
+        } else {
+            showResult('balanceResult', `❌ ${data.message}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка пополнения баланса:', error);
+        showResult('balanceResult', '❌ Ошибка сети', 'error');
+    });
+}
+
+function loadAllUsers() {
+    document.getElementById('usersContainer').innerHTML = '<div class="text-center" style="padding: 20px;">⏳ Загрузка пользователей...</div>';
+    
+    fetch('/api/admin/users')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const users = data.users;
+                let html = '';
+                
+                users.forEach(user => {
+                    const verifiedBadge = user.verified ? '<span style="color: #28a745;">✅ Верифицирован</span>' : '<span style="color: #dc3545;">❌ Не верифицирован</span>';
+                    
+                    html += `
+                        <div style="border: 1px solid var(--tg-theme-hint-color); border-radius: 8px; padding: 12px; margin: 8px 0; background: var(--tg-theme-bg-color);">
+                            <div style="font-weight: bold; margin-bottom: 4px;">
+                                🆔 UID: ${user.uid} | 📱 ID: ${user.telegram_id}
+                            </div>
+                            <div style="margin-bottom: 4px;">
+                                👤 ${user.first_name || 'Нет имени'} ${user.username ? '@' + user.username : ''}
+                            </div>
+                            <div style="margin-bottom: 4px;">
+                                💰 ⭐${user.balance_stars} ₽${user.balance_rub} | 💼 ${user.successful_deals} сделок
+                            </div>
+                            <div style="font-size: 12px; color: var(--tg-theme-hint-color);">
+                                ${verifiedBadge} | 📅 ${new Date(user.created_at).toLocaleDateString()}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('usersContainer').innerHTML = html || '<div class="text-center" style="padding: 20px;">Пользователи не найдены</div>';
+            } else {
+                document.getElementById('usersContainer').innerHTML = '<div class="alert alert-warning">Ошибка загрузки пользователей</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки пользователей:', error);
+            document.getElementById('usersContainer').innerHTML = '<div class="alert alert-warning">Ошибка загрузки пользователей</div>';
+        });
+}
+
+function showResult(elementId, message, type) {
+    const element = document.getElementById(elementId);
+    let className = 'alert ';
+    
+    switch(type) {
+        case 'success':
+            className += 'alert-success';
+            break;
+        case 'error':
+            className += 'alert-danger';
+            break;
+        case 'info':
+            className += 'alert-info';
+            break;
+        default:
+            className += 'alert-info';
+    }
+    
+    element.innerHTML = `<div class="${className}">${message}</div>`;
+    
+    // Автоматически скрываем через 5 секунд для успешных операций
+    if (type === 'success') {
+        setTimeout(() => {
+            element.innerHTML = '';
+        }, 5000);
+    }
+}
+
+function updateDealsCount() {
+    const uid = document.getElementById('dealsUID').value.trim().toUpperCase();
+    const dealsCount = parseInt(document.getElementById('dealsCount').value) || 0;
+    
+    if (!uid) {
+        showResult('dealsResult', 'Введите UID пользователя', 'error');
+        return;
+    }
+    
+    if (uid.length !== 8) {
+        showResult('dealsResult', 'UID должен содержать 8 символов', 'error');
+        return;
+    }
+    
+    if (dealsCount < 0) {
+        showResult('dealsResult', 'Количество сделок не может быть отрицательным', 'error');
+        return;
+    }
+    
+    showResult('dealsResult', 'Обновляем количество сделок...', 'info');
+    
+    fetch('/api/admin/update_deals_by_uid', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            uid: uid,
+            deals_count: dealsCount
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showResult('dealsResult', `✅ ${data.message}`, 'success');
+            // Очищаем форму
+            document.getElementById('dealsUID').value = '';
+            document.getElementById('dealsCount').value = '';
+            // Обновляем статистику
+            loadStats();
+        } else {
+            showResult('dealsResult', `❌ ${data.message}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка обновления сделок:', error);
+        showResult('dealsResult', '❌ Ошибка сети', 'error');
+    });
+}
+</script>
+{% endblock %}
